@@ -33,8 +33,8 @@ func LoadConfig() {
 	AppConfig = Config{
 		ServerPort:     Getenv("SERVER_PORT", "8000"),
 		AllowedOrigins: Getenv("ALLOWED_ORIGINS", "http://localhost:3000"),
-		MongoURI:       Getenv("MONGO_URI", "mongodb://root:mongo@localhost:27017/filehub?authSource=admin"),
-		DatabaseURL:    Getenv("DATABASE_URL", "postgres://admin:psql@localhost:5432/filehub_users?sslmode=disable"),
+		MongoURI:       Getenv("MONGO_URI", "mongodb://my-mongo-url"),
+		DatabaseURL:    Getenv("DATABASE_URL", "postgres://my-psql-url"),
 		JWTSecret:      Getenv("JWT_SECRET", "a-very-secret-key-that-should-be-long-and-random"),
 		JWTExpiresIn:   getEnvAsDuration("JWT_EXPIRES_IN_HOURS", 24),
 		UploadDir:      Getenv("UPLOAD_DIR", "uploads"),

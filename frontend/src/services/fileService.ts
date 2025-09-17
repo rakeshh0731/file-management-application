@@ -1,8 +1,7 @@
-import axios from 'axios';
+import api from './api';
 import { File as FileType } from '../types/file';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
-const API_ORIGIN = new URL(API_URL).origin; // This will give us http://localhost:8000
+const API_ORIGIN = new URL(api.defaults.baseURL!).origin;
 
 export interface FilterParams {
   search?: string;
@@ -18,11 +17,7 @@ export const fileService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axios.post(`${API_URL}/files/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.post(`/files/`, formData);
     return response.data;
   },
 
@@ -33,12 +28,12 @@ export const fileService = {
         params.append(key, String(value));
       }
     });
-    const response = await axios.get(`${API_URL}/files/`, { params });
+    const response = await api.get(`/files/`, { params });
     return response.data;
   },
 
   async deleteFile(id: string): Promise<void> {
-    await axios.delete(`${API_URL}/files/${id}/`);
+    await api.delete(`/files/${id}/`);
   },
 
   async downloadFile(fileUrl: string, filename: string): Promise<void> {
@@ -46,7 +41,7 @@ export const fileService = {
       // The fileUrl from the backend is a path (e.g., /uploads/...).
       // We need to construct the full URL to the backend server.
       const fullUrl = `${API_ORIGIN}${fileUrl}`;
-      const response = await axios.get(fullUrl, {
+      const response = await api.get(fullUrl, {
         responseType: 'blob',
       });
       

@@ -1,87 +1,92 @@
-# Abnormal File Vault
+# File Hub Application
 
-A full-stack file management application built with React and Django, designed for efficient file handling and storage.
+A full-stack file management application built with a Go backend and a React frontend, designed for efficient and authenticated file handling.
 
 ## 🚀 Technology Stack
 
 ### Backend
-- Django 4.x (Python web framework)
-- Django REST Framework (API development)
-- SQLite (Development database)
-- Gunicorn (WSGI HTTP Server)
-- WhiteNoise (Static file serving)
+- **Go**: Core application language
+- **Gorilla/Mux**: HTTP router
+- **GORM**: ORM for PostgreSQL user database
+- **PostgreSQL**: User authentication and metadata
+- **MongoDB**: File metadata storage
+- **JWT**: For handling user authentication tokens
 
 ### Frontend
 - React 18 with TypeScript
 - TanStack Query (React Query) for data fetching
 - Axios for API communication
 - Tailwind CSS for styling
-- Heroicons for UI elements
 
 ### Infrastructure
-- Docker and Docker Compose
-- Local file storage with volume mounting
+- Docker for running PostgreSQL and MongoDB databases
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have installed:
-- Docker (20.10.x or higher) and Docker Compose (2.x or higher)
-- Node.js (18.x or higher) - for local development
-- Python (3.9 or higher) - for local development
+- **Docker**: To run the databases.
+- **Go** (1.21 or higher): For running the backend.
+- **Node.js** (18.x or higher): For running the frontend.
 
 ## 🛠️ Installation & Setup
 
-### Using Docker (Recommended)
+### 1. Start Databases with Docker
 
-```bash
-docker-compose up --build
+Run the following commands to start the PostgreSQL and MongoDB containers.
+
+**PostgreSQL (for Users)**
+```sh
+docker run --name filehub-psql -d \
+  -p 5432:5432 \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=psql \
+  -e POSTGRES_DB=filehub_users \
+  postgres:latest
 ```
 
-### Local Development Setup
+**MongoDB (for Files)**
+```sh
+docker run --name filehub-mongo -d -p 27017:27017 mongo:latest
+```
 
-#### Backend Setup
-1. **Create and activate virtual environment**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+### 2. Backend Setup (Go)
+
+1. **Navigate to the backend directory**
+   ```sh
+   cd go-backend
    ```
 
 2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
+   ```sh
+   go mod tidy
    ```
 
-3. **Create necessary directories**
-   ```bash
-   mkdir -p media staticfiles data
+3. **Create environment file**
+   Copy the example environment file. The default values should work with the Docker setup above.
+   ```sh
+   cp .env.example .env
    ```
 
-4. **Run migrations**
-   ```bash
-   python manage.py migrate
+4. **Start the development server**
+   ```sh
+   go run .
    ```
+   The backend server will be running on `http://localhost:8000`.
 
-5. **Start the development server**
-   ```bash
-   python manage.py runserver
-   ```
+### 3. Frontend Setup (React)
 
-#### Frontend Setup
-1. **Install dependencies**
-   ```bash
+1. **Navigate to the frontend directory**
+   ```sh
    cd frontend
+   ```
+
+2. **Install dependencies**
+   ```sh
    npm install
    ```
 
-2. **Create environment file**
-   Create `.env.local`:
-   ```
-   REACT_APP_API_URL=http://localhost:8000/api
-   ```
-
-3. **Start development server**
-   ```bash
+3. **Start the development server**
+   ```sh
    npm start
    ```
 
@@ -90,117 +95,24 @@ docker-compose up --build
 - Frontend Application: http://localhost:3000
 - Backend API: http://localhost:8000/api
 
-## 📝 API Documentation
-
-### File Management Endpoints
-
-#### List Files
-- **GET** `/api/files/`
-- Returns a list of all uploaded files
-- Response includes file metadata (name, size, type, upload date)
-
-#### Upload File
-- **POST** `/api/files/`
-- Upload a new file
-- Request: Multipart form data with 'file' field
-- Returns: File metadata including ID and upload status
-
-#### Get File Details
-- **GET** `/api/files/<file_id>/`
-- Retrieve details of a specific file
-- Returns: Complete file metadata
-
-#### Delete File
-- **DELETE** `/api/files/<file_id>/`
-- Remove a file from the system
-- Returns: 204 No Content on success
-
-#### Download File
-- Access file directly through the file URL provided in metadata
-
 ## 🗄️ Project Structure
 
 ```
-file-hub/
-├── backend/                # Django backend
-│   ├── files/             # Main application
-│   │   ├── models.py      # Data models
-│   │   ├── views.py       # API views
-│   │   ├── urls.py        # URL routing
-│   │   └── serializers.py # Data serialization
-│   ├── core/              # Project settings
-│   └── requirements.txt   # Python dependencies
+file-management/
+├── go-backend/            # Go backend
+│   ├── api/               # API handlers and router
+│   ├── config/            # Environment configuration
+│   ├── database/          # Database connections (PSQL, Mongo)
+│   ├── models/            # Data models (User, File)
+│   ├── go.mod             # Go dependencies
+│   └── main.go            # Application entrypoint
 ├── frontend/              # React frontend
 │   ├── src/
 │   │   ├── components/    # React components
+│   │   ├── contexts/      # React contexts (e.g., AuthContext)
+│   │   ├── pages/         # Page components
 │   │   ├── services/      # API services
 │   │   └── types/         # TypeScript types
 │   └── package.json      # Node.js dependencies
-└── docker-compose.yml    # Docker composition
+└── .gitignore             # Files and folders to ignore in git
 ```
-
-## 🔧 Development Features
-
-- Hot reloading for both frontend and backend
-- React Query DevTools for debugging data fetching
-- TypeScript for better development experience
-- Tailwind CSS for rapid UI development
-
-## 🐛 Troubleshooting
-
-1. **Port Conflicts**
-   ```bash
-   # If ports 3000 or 8000 are in use, modify docker-compose.yml or use:
-   # Frontend: npm start -- --port 3001
-   # Backend: python manage.py runserver 8001
-   ```
-
-2. **File Upload Issues**
-   - Maximum file size: 10MB
-   - Ensure proper permissions on media directory
-   - Check network tab for detailed error messages
-
-3. **Database Issues**
-   ```bash
-   # Reset database
-   rm backend/data/db.sqlite3
-   python manage.py migrate
-   ```
-
-# Project Submission Instructions
-
-## Preparing Your Submission
-
-1. Before creating your submission zip file, ensure:
-   - All features are implemented and working as expected
-   - All tests are passing
-   - The application runs successfully locally
-   - Remove any unnecessary files or dependencies
-   - Clean up any debug/console logs
-
-2. Create the submission zip file:
-   ```bash
-   # Activate your backend virtual environment first
-   cd backend
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   
-   # Run the submission script from the project root
-   cd ..
-   python create_submission_zip.py
-   ```
-
-   The script will:
-   - Create a zip file named `username_YYYYMMDD.zip` (e.g., `johndoe_20240224.zip`)
-   - Respect .gitignore rules to exclude unnecessary files
-   - Preserve file timestamps
-   - Show you a list of included files and total size
-   - Warn you if the zip is unusually large
-
-3. Verify your submission zip file:
-   - Extract the zip file to a new directory
-   - Ensure all necessary files are included
-   - Verify that no unnecessary files (like node_modules, __pycache__, etc.) are included
-   - Test the application from the extracted files to ensure everything works
-
-Once you have prepared the project for submission follow the instructions in the email to submit the project along with the video. 
-
